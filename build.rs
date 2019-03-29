@@ -47,7 +47,6 @@ fn build_guest() {
 }
 
 fn build_host() {  
-    println!("cargo:rustc-link-lib=stdc++");
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
@@ -79,6 +78,7 @@ fn build_host() {
         .expect("Couldn't write bindings!");
 
     cc::Build::new()
+        .cpp(true)
         .file("src/host.cpp")
         .flag("-Wno-unused-parameter")
         .compile("cr");
