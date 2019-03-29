@@ -1,13 +1,8 @@
-use std::os::raw::{c_int, c_uint, c_void};
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
 
-#[repr(C)]
-#[derive(Debug)]
-pub struct cr_plugin {
-    p: *mut c_void,
-    pub userdata: *mut c_void,
-    pub version: c_uint,
-    pub failure: c_int,
-}
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 impl cr_plugin {
     pub fn new() -> cr_plugin {
@@ -15,26 +10,7 @@ impl cr_plugin {
             p: std::ptr::null_mut(),
             userdata: std::ptr::null_mut(),
             version: 0,
-            failure: 0,
+            failure: cr_failure::CR_NONE,
         }
-    }
-}
-
-#[cfg(not(guest))]
-pub mod host {
-    use std::os::raw::{c_int, c_char};
-    
-    use super::cr_plugin;
-    
-    extern "C" {
-        pub fn cr_plugin_load(ctx: &mut cr_plugin, fullpath: *const c_char) -> bool;
-        pub fn cr_plugin_update(ctx: &mut cr_plugin, reload_check: bool) -> c_int;
-        pub fn cr_plugin_close(ctx: &mut cr_plugin);
-    
-        pub fn wrap_cr_set_temporary_path(ctx: &mut cr_plugin, path: *const c_char) -> bool;
-    }
-    
-    pub unsafe fn cr_set_temporary_path(ctx: &mut cr_plugin, path: *const c_char) {
-        wrap_cr_set_temporary_path(ctx, path);
     }
 }

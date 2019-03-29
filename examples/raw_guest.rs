@@ -15,7 +15,7 @@ pub fn cr_main(_ctx: &mut cr_plugin, _cr_op: c_int) -> c_int {
         let mut plugin = cr_sys::cr_plugin::new();
 
         let s_fullpath = std::ffi::CString::new("libtest.so").unwrap();
-        unsafe { host::cr_plugin_load(&mut plugin, s_fullpath.as_ptr());}
+        unsafe { cr_plugin_load(&mut plugin, s_fullpath.as_ptr());}
         println!("- plugin = {:?}", plugin);
     }
 
