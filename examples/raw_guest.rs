@@ -5,6 +5,8 @@ use std::os::raw::{c_int};
 use std::time::Duration;
 use std::thread;
 
+use std::panic;
+
 mod raw_state;
 
 use raw_state::*;
@@ -15,6 +17,21 @@ use cr_sys::cr_op::*;
 
 #[no_mangle]
 pub fn cr_main(ctx: &mut cr_plugin, cr_op: cr_op) -> c_int {
+    match panic::catch_unwind(panic::AssertUnwindSafe(|| {
+        plugin_main(ctx, cr_op)
+    })) {
+        Ok(rc) => rc,
+        Err(e) => {
+            // signal failure and rollback version.
+            ctx.failure = cr_failure::CR_SEGFAULT;
+            if ctx.version > 0 { ctx.version -= 1; }
+            println!("CAUGHT PANIC: {:?}", e);
+            -1
+        },
+    }
+}
+
+pub fn plugin_main(ctx: &mut cr_plugin, cr_op: cr_op) -> c_int {
     // Test "guest" feature.
     #[cfg(not(guest))]
     {
@@ -41,7 +58,9 @@ pub fn cr_main(ctx: &mut cr_plugin, cr_op: cr_op) -> c_int {
             println!("Plugin step. count = {}. version = {}", state.counter, version);
 
             // slow down the printing.
-            thread::sleep(Duration::from_millis(200));
+            thread::sleep(Duration::from_millis(800));
+
+            //panic!("test");
         },
         CR_UNLOAD => {
             println!("Plugin unload. version = {}", ctx.version);

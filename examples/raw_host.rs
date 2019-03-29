@@ -29,17 +29,12 @@ fn main() {
     let s_fullpath = std::ffi::CString::new(plugin_name).unwrap();
     unsafe { cr_plugin_load(&mut plugin, s_fullpath.as_ptr()) };
 
-    let mut err_cnt = 0;
     loop {
-        println!("Run Update:");
+        println!("Run Update: cr_failure={:?}", plugin.failure);
         let rc = unsafe { cr_plugin_update(&mut plugin, true)};
         println!("cr_plugin_update(ctx, true) = {}", rc);
         if rc != 0 {
             println!("Plugin error: {:?}", plugin.failure);
-            err_cnt += 1;
-            if err_cnt > 10 {
-                break;
-            }
         }
         thread::sleep(Duration::from_millis(200));
     }
