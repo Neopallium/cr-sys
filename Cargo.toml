@@ -14,11 +14,11 @@ guest = []
 [dependencies]
 
 [[example]]
-name = "basic_host"
+name = "raw_host"
 crate-type = ["bin"]
 
 [[example]]
-name = "basic_guest"
+name = "raw_guest"
 crate-type = ["cdylib"]
 
 [build-dependencies]

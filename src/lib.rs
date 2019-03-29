@@ -1,55 +1,40 @@
-pub mod common;
+use std::os::raw::{c_int, c_uint, c_void};
 
-#[cfg(not(guest))]
-pub mod host;
-
-use common::cr_plugin;
-
+#[repr(C)]
 #[derive(Debug)]
-pub struct Plugin {
-    ctx: cr_plugin,
+pub struct cr_plugin {
+    p: *mut c_void,
+    pub userdata: *mut c_void,
+    pub version: c_uint,
+    pub failure: c_int,
 }
 
-impl Plugin {
-    #[cfg(not(guest))]
-    pub fn new(fullpath: &str) -> Plugin {
-        let mut plugin = Plugin {
-            ctx: cr_plugin::new(),
-        };
-        // Store our Plugin struct as the `userdata`
-        plugin.ctx.userdata = &mut plugin as *mut _ as *mut ::std::os::raw::c_void;
-
-        let s_fullpath = std::ffi::CString::new(fullpath).unwrap();
-        unsafe { host::cr_plugin_load(&mut plugin.ctx, s_fullpath.as_ptr())};
-
-        plugin
-    }
-
-    pub fn from_ctx(ctx: &mut cr_plugin) -> &mut Plugin {
-        unsafe { &mut *(ctx.userdata as *mut Plugin) }
-    }
-
-    #[cfg(not(guest))]
-    pub fn update(&mut self, reload_check: bool) -> i32 {
-        unsafe { host::cr_plugin_update(&mut self.ctx, reload_check)}
+impl cr_plugin {
+    pub fn new() -> cr_plugin {
+        cr_plugin {
+            p: std::ptr::null_mut(),
+            userdata: std::ptr::null_mut(),
+            version: 0,
+            failure: 0,
+        }
     }
 }
 
 #[cfg(not(guest))]
-impl Drop for Plugin {
-    fn drop(&mut self) {
-        unsafe { host::cr_plugin_close(&mut self.ctx)}
+pub mod host {
+    use std::os::raw::{c_int, c_char};
+    
+    use super::cr_plugin;
+    
+    extern "C" {
+        pub fn cr_plugin_load(ctx: &mut cr_plugin, fullpath: *const c_char) -> bool;
+        pub fn cr_plugin_update(ctx: &mut cr_plugin, reload_check: bool) -> c_int;
+        pub fn cr_plugin_close(ctx: &mut cr_plugin);
+    
+        pub fn wrap_cr_set_temporary_path(ctx: &mut cr_plugin, path: *const c_char) -> bool;
+    }
+    
+    pub unsafe fn cr_set_temporary_path(ctx: &mut cr_plugin, path: *const c_char) {
+        wrap_cr_set_temporary_path(ctx, path);
     }
 }
-
-#[macro_export]
-macro_rules! cr_main {
-    ($rust_cr_main:ident) => (
-        #[no_mangle]
-        pub fn cr_main(ctx: &mut cr_sys::common::cr_plugin, cr_op: c_int) -> c_int {
-            let plugin = cr_sys::Plugin::from_ctx(ctx);
-            $rust_cr_main(plugin, cr_op)
-        }
-    )
-}
-
