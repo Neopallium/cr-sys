@@ -17,14 +17,14 @@ use cr_sys::cr_op::*;
 
 #[no_mangle]
 pub fn cr_main(ctx: &mut cr_plugin, cr_op: cr_op) -> c_int {
+    // Using the raw bindings we must catch unwind.
     match panic::catch_unwind(panic::AssertUnwindSafe(|| {
         plugin_main(ctx, cr_op)
     })) {
         Ok(rc) => rc,
         Err(e) => {
-            // signal failure and rollback version.
+            // signal failure, host will rollback.
             ctx.failure = cr_failure::CR_SEGFAULT;
-            if ctx.version > 0 { ctx.version -= 1; }
             println!("CAUGHT PANIC: {:?}", e);
             -1
         },
