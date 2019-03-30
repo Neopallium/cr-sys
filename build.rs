@@ -7,7 +7,7 @@ extern crate bindgen;
 use std::env;
 use std::path::PathBuf;
 
-fn main() {  
+fn main() {
     if cfg!(feature = "guest") {
         build_guest();
     } else {
@@ -15,7 +15,7 @@ fn main() {
     }
 }
 
-fn build_guest() {  
+fn build_guest() {
     println!("cargo:rustc-cfg=guest");
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
@@ -47,7 +47,7 @@ fn build_guest() {
         .compile("cr");
 }
 
-fn build_host() {  
+fn build_host() {
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
@@ -55,7 +55,8 @@ fn build_host() {
         // enable CR_HOST
         .header("src/host.cpp")
         // compile as c++
-        .clang_arg("-x").clang_arg("c++")
+        .clang_arg("-x")
+        .clang_arg("c++")
         // Host-side functions
         .whitelist_function("cr_plugin_load")
         // Wrap cr_plugin_reload() with a temporary fix.

@@ -2,8 +2,8 @@ extern crate cr_sys;
 
 use std::env;
 
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 
 use cr_sys::*;
 
@@ -19,9 +19,7 @@ fn main() {
 
     // Plugin
     let mut plugin = cr_sys::cr_plugin::new();
-    let mut state = RawState {
-        counter: 0,
-    };
+    let mut state = RawState { counter: 0 };
     plugin.userdata = &mut state as *mut _ as *mut ::std::os::raw::c_void;
 
     let plugin_name = plugin_name.to_str().unwrap();
@@ -32,7 +30,7 @@ fn main() {
     let mut bad_versions = std::collections::HashSet::new();
     loop {
         println!("Run Update: cr_failure={:?}", plugin.failure);
-        let rc = unsafe { cr_plugin_update(&mut plugin, true)};
+        let rc = unsafe { cr_plugin_update(&mut plugin, true) };
         println!("cr_plugin_update(ctx, true) = {}", rc);
         if rc != 0 {
             println!("Plugin error: {:?}", plugin.failure);
@@ -46,7 +44,6 @@ fn main() {
         thread::sleep(Duration::from_millis(200));
     }
     println!("Call cr_plugin_close(ctx)");
-    unsafe { cr_plugin_close(&mut plugin)};
+    unsafe { cr_plugin_close(&mut plugin) };
     println!("exit");
 }
-
