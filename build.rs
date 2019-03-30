@@ -63,6 +63,7 @@ fn build_host() {
         //.whitelist_function("cr_plugin_update")
         .whitelist_function("rust_cr_plugin_reload_fix")
         .whitelist_function("rust_cr_plugin_update_fix")
+        .whitelist_function("rust_cr_plugin_get_filename")
         .whitelist_function("cr_plugin_close")
         .whitelist_function("wrap_cr_set_temporary_path")
         // Enums

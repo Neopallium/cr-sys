@@ -19,3 +19,11 @@ impl cr_plugin {
 pub unsafe fn cr_plugin_update(ctx: *mut cr_plugin, reload_check: bool) -> ::std::os::raw::c_int {
     rust_cr_plugin_update_fix(ctx, reload_check)
 }
+
+#[cfg(not(guest))]
+pub fn cr_plugin_get_filename(ctx: *mut cr_plugin) -> std::path::PathBuf {
+    let mut buf: [u8; 1024] = [0; 1024];
+    let len = unsafe { rust_cr_plugin_get_filename(ctx, buf.as_mut_ptr(), buf.len()-1) };
+
+    std::path::PathBuf::from(String::from_utf8_lossy(&buf[0..len]).to_string())
+}

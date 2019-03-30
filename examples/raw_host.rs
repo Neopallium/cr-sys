@@ -32,6 +32,7 @@ fn main() {
         println!("Run Update: cr_failure={:?}", plugin.failure);
         let rc = unsafe { cr_plugin_update(&mut plugin, true) };
         println!("cr_plugin_update(ctx, true) = {}", rc);
+        println!("Plugin current filename = {:?}", cr_plugin_get_filename(&mut plugin));
         if rc != 0 {
             println!("Plugin error: {:?}", plugin.failure);
             // mark the current version as bad.
