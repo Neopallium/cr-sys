@@ -14,3 +14,8 @@ impl cr_plugin {
         }
     }
 }
+
+#[cfg(not(guest))]
+pub unsafe fn cr_plugin_update(ctx: *mut cr_plugin, reload_check: bool) -> ::std::os::raw::c_int {
+    rust_cr_plugin_update_fix(ctx, reload_check)
+}

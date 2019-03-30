@@ -58,7 +58,10 @@ fn build_host() {
         .clang_arg("-x").clang_arg("c++")
         // Host-side functions
         .whitelist_function("cr_plugin_load")
-        .whitelist_function("cr_plugin_update")
+        // Wrap cr_plugin_reload() with a temporary fix.
+        //.whitelist_function("cr_plugin_update")
+        .whitelist_function("rust_cr_plugin_reload_fix")
+        .whitelist_function("rust_cr_plugin_update_fix")
         .whitelist_function("cr_plugin_close")
         .whitelist_function("wrap_cr_set_temporary_path")
         // Enums
