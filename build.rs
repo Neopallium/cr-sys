@@ -43,6 +43,7 @@ fn build_guest() {
     cc::Build::new()
         .file("src/guest.c")
         .flag("-Wno-unused-parameter")
+        .flag("-Wno-unknown-pragmas")
         .compile("cr");
 }
 
