@@ -27,20 +27,18 @@ fn main() {
     let s_fullpath = std::ffi::CString::new(plugin_name).unwrap();
     unsafe { cr_plugin_load(&mut plugin, s_fullpath.as_ptr()) };
 
-    let mut bad_versions = std::collections::HashSet::new();
     loop {
         println!("Run Update: cr_failure={:?}", plugin.failure);
         let rc = unsafe { cr_plugin_update(&mut plugin, true) };
         println!("cr_plugin_update(ctx, true) = {}", rc);
-        println!("Plugin current filename = {:?}", cr_plugin_get_filename(&mut plugin));
+        let file = unsafe { cr_plugin_get_filename(&mut plugin)};
+        println!("Plugin current filename = {:?}", file);
         if rc != 0 {
-            println!("Plugin error: {:?}", plugin.failure);
-            // mark the current version as bad.
-            bad_versions.insert(plugin.version);
-            // rollback to previous version.  Skip bad version during rollback.
-            while plugin.version > 0 && bad_versions.contains(&plugin.version) {
-                plugin.version -= 1;
+            // Allow plugin to signal host to exit.
+            if rc == -10 {
+                break;
             }
+            println!("Plugin error: {:?}", plugin.failure);
         }
         thread::sleep(Duration::from_millis(200));
     }

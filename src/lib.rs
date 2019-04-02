@@ -11,6 +11,7 @@ impl cr_plugin {
             userdata: std::ptr::null_mut(),
             version: 0,
             failure: cr_failure::CR_NONE,
+            last_version: 0,
         }
     }
 }
