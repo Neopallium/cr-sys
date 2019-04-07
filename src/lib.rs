@@ -11,7 +11,8 @@ impl cr_plugin {
             userdata: std::ptr::null_mut(),
             version: 0,
             failure: cr_failure::CR_NONE,
-            last_version: 0,
+            next_version: 1,
+            last_working_version: 0,
         }
     }
 }
@@ -20,11 +21,6 @@ impl Default for cr_plugin {
     fn default() -> Self {
         Self::new()
     }
-}
-
-#[cfg(not(guest))]
-pub unsafe fn cr_plugin_update(ctx: *mut cr_plugin, reload_check: bool) -> ::std::os::raw::c_int {
-    rust_cr_plugin_update_fix(ctx, reload_check)
 }
 
 #[cfg(not(guest))]

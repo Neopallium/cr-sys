@@ -23,6 +23,7 @@ pub fn cr_main(ctx: &mut cr_plugin, cr_op: cr_op) -> c_int {
         Err(e) => {
             // signal failure, host will rollback.
             ctx.failure = cr_failure::CR_SEGFAULT;
+            ctx.version = ctx.last_working_version;
             println!("CAUGHT PANIC: {:?}", e);
             -1
         }
